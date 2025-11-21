@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const baseUrl = "http://tu-api.com";
+  static const baseUrl = "http://gestores.testori.com.ar:11011";
 
   static Future<String?> login(String user, String pass) async {
     final res = await http.post(
