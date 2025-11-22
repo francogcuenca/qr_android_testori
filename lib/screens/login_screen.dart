@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print("Token guardado correctamente");
       print("Redirigiendo a /scanner ...");
 
-      Navigator.pushReplacementNamed(context, '/scanner');
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       print("LOGIN FALLÓ: token == null");
       print("Backend devolvió error o status != 200");

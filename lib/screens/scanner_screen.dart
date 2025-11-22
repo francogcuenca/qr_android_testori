@@ -16,25 +16,28 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   Future<void> _onDetect(BarcodeCapture capture) async {
     if (_processing) return;
+
     final raw = capture.barcodes.first.rawValue;
     if (raw == null) return;
 
     setState(() => _processing = true);
 
     try {
+      // El modelo ya limpia espacios y parsea correctamente
       final pq = PickedQr.fromBarcodeString(raw);
-      // si estamos en singleMode devolvemos el objeto
+
       if (widget.singleMode) {
         Navigator.of(context).pop(pq);
         return;
       }
-      // en modo continuo podrías guardarlo en prefs (no usado aquí)
+
+      // acá podrías guardar el QR en SharedPreferences si querés
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('QR inválido')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('QR inválido: formato incorrecto')),
+      );
     } finally {
-      await Future.delayed(Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 800));
       setState(() => _processing = false);
     }
   }
@@ -63,9 +66,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
           if (_processing)
             Center(
               child: Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 color: Colors.black45,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             ),
         ],

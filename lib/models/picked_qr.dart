@@ -1,13 +1,17 @@
+import 'dart:developer' as developer;
+
 class PickedQr {
   final String numOt;
   final String codPieza;
+  final String numMedio;
   final int cantidad;
   final String lote;
-  final String creador; // si no viene en el QR, se deja vacio
+  final String creador; // opcional
 
   PickedQr({
     required this.numOt,
     required this.codPieza,
+    required this.numMedio,
     required this.cantidad,
     required this.lote,
     this.creador = '',
@@ -16,29 +20,51 @@ class PickedQr {
   Map<String, dynamic> toJson() => {
     'num_ot': numOt,
     'cod_pieza': codPieza,
+    'num_medio': numMedio,
     'cantidad': cantidad,
     'lote': lote,
     'creador': creador,
   };
 
-  static PickedQr fromBarcodeString(String s) {
-    // Asumimos formato fijo: 5 + 10 + 8 + 8 = 31 chars
-    final clean = s.trim();
-    if (clean.length < 31) {
-      throw FormatException('Código QR inválido. Longitud menor a 31.');
-    }
-    final numOt = clean.substring(0, 5);
-    final codPieza = clean.substring(5, 15);
-    final cantidadStr = clean.substring(15, 23);
-    final lote = clean.substring(23, 31);
+  static PickedQr fromBarcodeString(String raw) {
+    // LOG: raw recibido (crudo)
+    developer.log('PickedQr.fromBarcodeString - raw: <$raw>');
 
-    final cantidad = int.tryParse(cantidadStr) ?? 0;
+    // eliminar TODO tipo de whitespace (espacios, tabs, NBSP, saltos)
+    final clean = raw.replaceAll(RegExp(r'\s+'), '').trim();
+
+    // LOG: clean y longitud
+    developer.log('PickedQr.fromBarcodeString - clean: <$clean>');
+    developer.log('PickedQr.fromBarcodeString - clean.length: ${clean.length}');
+
+    if (clean.length < 29) {
+      throw FormatException(
+        'Código QR inválido. Longitud esperada mínima: 29. Recibido: ${clean.length}',
+      );
+    }
+
+    // Para debug, imprimimos los slices antes de construir
+    final sNumOt = clean.substring(0, 5);
+    final sCodPieza = clean.substring(5, 15);
+    final sCantidad = clean.substring(15, 21);
+    final sLote = clean.substring(21, 25);
+    final sNumMedio = clean.substring(25, 29);
+
+    developer.log(
+      'Parsed substrings -> numOt: <$sNumOt>, codPieza: <$sCodPieza>, numMedio: <$sNumMedio>, cantidad: <$sCantidad>, lote: <$sLote>',
+    );
+
+    final cantidad = int.tryParse(sCantidad) ?? 0;
+    if (cantidad == 0) {
+      developer.log('WARNING: cantidad parsed as 0 from <$sCantidad>');
+    }
 
     return PickedQr(
-      numOt: numOt,
-      codPieza: codPieza,
+      numOt: sNumOt,
+      codPieza: sCodPieza,
+      numMedio: sNumMedio,
       cantidad: cantidad,
-      lote: lote,
+      lote: sLote,
     );
   }
 }

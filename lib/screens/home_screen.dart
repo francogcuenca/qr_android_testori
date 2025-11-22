@@ -46,9 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _savePickedToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = picked.map((p) {
-      // regenero el string original para persistir (simple)
-      final cantidadStr = p.cantidad.toString().padLeft(8, '0');
-      return "${p.numOt}${p.codPieza}${cantidadStr}${p.lote}";
+      final cantidadStr = p.cantidad.toString().padLeft(6, '0');
+      final numMedioStr = p.numMedio.toString().padLeft(4, '0');
+      return "${p.numOt}${p.codPieza}${numMedioStr}${cantidadStr}${p.lote}";
     }).toList();
     await prefs.setStringList('qrs', raw);
   }
@@ -99,28 +99,25 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Movimiento enviado.')));
-      // limpiamos
       setState(() => picked.clear());
       await _savePickedToPrefs();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error enviando movimiento: ${res.statusCode}')),
+        SnackBar(content: Text('Error enviando: ${res.statusCode}')),
       );
-      // opcional: ver body
       debugPrint('Error body: ${res.body}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text('QR Picker')),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            // botones arriba
+            // BOTONES
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -128,7 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: _scanSingle,
                   icon: Icon(Icons.qr_code_scanner),
                   label: Text('Scan QR'),
-                  style: ElevatedButton.styleFrom(padding: EdgeInsets.all(12)),
                 ),
                 ElevatedButton.icon(
                   onPressed: sending ? null : _sendMovimiento,
@@ -151,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: 12),
 
-            // selects de almacenes
+            // SELECTS
             Row(
               children: [
                 Expanded(
@@ -184,30 +180,59 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: 12),
 
-            // lista de qrs
+            // LISTA DE QRS — AHORA LINDA Y ORDENADA
             Expanded(
               child: picked.isEmpty
                   ? Center(child: Text('No hay artículos escaneados'))
                   : ListView.separated(
+                      itemCount: picked.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 6),
                       itemBuilder: (_, idx) {
                         final p = picked[idx];
-                        return ListTile(
-                          title: Text('${p.codPieza} — OT ${p.numOt}'),
-                          subtitle: Text(
-                            'Cant: ${p.cantidad} — Lote: ${p.lote}',
+
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () => _removeAt(idx),
+                          elevation: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _row('OT', p.numOt),
+                                _row('Cod. Pieza', p.codPieza),
+                                _row('Num. Medio', p.numMedio.toString()),
+                                _row('Cantidad', p.cantidad.toString()),
+                                _row('Lote', p.lote),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _removeAt(idx),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
-                      separatorBuilder: (_, __) => Divider(),
-                      itemCount: picked.length,
                     ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _row(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Text('$label: ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value)),
+        ],
       ),
     );
   }
