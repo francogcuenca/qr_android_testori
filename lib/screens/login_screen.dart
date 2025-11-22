@@ -15,20 +15,38 @@ class _LoginScreenState extends State<LoginScreen> {
   bool loading = false;
 
   login() async {
+    print("========== LOGIN INICIADO ==========");
+    print("Usuario ingresado: '${userCtrl.text}'");
+    print("Password ingresado: '${passCtrl.text}'");
+
     setState(() => loading = true);
+
     final token = await ApiService.login(userCtrl.text, passCtrl.text);
+
+    print("Respuesta del login (token): $token");
 
     setState(() => loading = false);
 
     if (token != null) {
+      print("Token válido recibido. Guardando en SharedPreferences...");
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
+
+      print("Token guardado correctamente");
+      print("Redirigiendo a /scanner ...");
+
       Navigator.pushReplacementNamed(context, '/scanner');
     } else {
+      print("LOGIN FALLÓ: token == null");
+      print("Backend devolvió error o status != 200");
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Usuario o contraseña incorrectos")),
       );
     }
+
+    print("========== FIN LOGIN ==========\n");
   }
 
   @override
