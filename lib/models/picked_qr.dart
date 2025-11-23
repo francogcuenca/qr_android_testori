@@ -30,7 +30,6 @@ class PickedQr {
     // LOG: raw recibido (crudo)
     developer.log('PickedQr.fromBarcodeString - raw: <$raw>');
 
-    // eliminar TODO tipo de whitespace (espacios, tabs, NBSP, saltos)
     final clean = raw.replaceAll(RegExp(r'\s+'), '').trim();
 
     // LOG: clean y longitud

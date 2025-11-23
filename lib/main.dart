@@ -3,6 +3,7 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/scanner_screen.dart';
 import 'screens/movimientos_screen.dart';
+import 'screens/movimiento_detalle_screen.dart';
 
 void main() {
   runApp(MyApp());

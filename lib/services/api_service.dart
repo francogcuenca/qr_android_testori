@@ -32,9 +32,38 @@ class ApiService {
   }
 
   static Future<List> getAlmacenes() async {
-    final res = await http.get(Uri.parse("$baseUrl/api/almacenes"));
-    if (res.statusCode == 200) return jsonDecode(res.body);
-    return [];
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      print("=== DEBUG getAlmacenes ===");
+      print("Token: $token");
+
+      final res = await http.get(
+        Uri.parse("$baseUrl/almacenes"),
+        headers: {
+          "Content-Type": "application/json",
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      );
+
+      print("Status: ${res.statusCode}");
+      print("Body: ${res.body}");
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        print("Decoded: $data");
+        print("=== FIN DEBUG ===");
+        return data;
+      }
+
+      print("Respuesta no OK, devolviendo lista vacía");
+      print("=== FIN DEBUG ===");
+      return [];
+    } catch (e) {
+      print("ERROR getAlmacenes: $e");
+      return [];
+    }
   }
 
   static Future<http.Response> postMovimiento({
@@ -57,7 +86,7 @@ class ApiService {
     };
 
     final res = await http.post(
-      Uri.parse("$baseUrl/api/movimientos"),
+      Uri.parse("$baseUrl/movimientos/crear"),
       headers: headers,
       body: body,
     );
@@ -70,11 +99,15 @@ class ApiService {
     final token = prefs.getString('token');
 
     final res = await http.get(
-      Uri.parse("$baseUrl/api/movimientos"),
+      Uri.parse("$baseUrl/movimientos/ver"),
       headers: {if (token != null) 'Authorization': 'Bearer $token'},
     );
 
-    if (res.statusCode == 200) return jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      final decoded = jsonDecode(res.body);
+      return decoded['movimientos'] ?? [];
+    }
+
     return [];
   }
 }
