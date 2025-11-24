@@ -3,6 +3,8 @@ import '../services/api_service.dart';
 import 'movimiento_detalle_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MovimientosScreen extends StatefulWidget {
   @override
@@ -42,6 +44,21 @@ class _MovimientosScreenState extends State<MovimientosScreen> {
     setState(() {
       selectedRange = DateTimeRange(start: start, end: end);
     });
+  }
+
+  Future<int?> getUserIdFromToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) return null;
+
+    try {
+      Map<String, dynamic> decoded = JwtDecoder.decode(token);
+      return decoded['id']; // o el campo que vos guardaste en el JWT
+    } catch (e) {
+      print("Error decodificando token: $e");
+      return null;
+    }
   }
 
   String formatFecha(String? fechaStr) {
@@ -85,18 +102,21 @@ class _MovimientosScreenState extends State<MovimientosScreen> {
   Future<void> _load() async {
     setState(() => loading = true);
 
-    // Preparamos parámetros para la API
+    // Obtener el userId directo del token
+    final creadorId = filtro == 'mios' ? await getUserIdFromToken() : null;
+
+    // Fechas
     String? dateFrom;
     String? dateTo;
+
     if (selectedRange != null) {
-      // Mandamos ISO strings (el backend puede parsearlas)
       dateFrom = selectedRange!.start.toIso8601String();
-      // Para incluir todo el día final, podés ajustar a 23:59:59 si tu backend no lo hace
       dateTo = selectedRange!.end.toIso8601String();
     }
 
+    // Ahora llamás a la API
     final data = await ApiService.getMovimientos(
-      creadorId: filtro == 'mios' ? userId : null,
+      creadorId: creadorId,
       dateFrom: dateFrom,
       dateTo: dateTo,
     );

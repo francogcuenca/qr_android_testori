@@ -102,11 +102,20 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    // Armar query params
+    // Query params EXACTOS como los espera el backend
     final params = <String, String>{};
-    if (creadorId != null) params['creador_id'] = creadorId.toString();
-    if (dateFrom != null) params['dateFrom'] = dateFrom;
-    if (dateTo != null) params['dateTo'] = dateTo;
+
+    if (creadorId != null && creadorId > 0) {
+      params['creadorId'] = creadorId.toString();
+    }
+
+    if (dateFrom != null && dateFrom.isNotEmpty) {
+      params['dateFrom'] = dateFrom;
+    }
+
+    if (dateTo != null && dateTo.isNotEmpty) {
+      params['dateTo'] = dateTo;
+    }
 
     final uri = Uri.parse(
       "$baseUrl/movimientos/ver",
@@ -119,8 +128,6 @@ class ApiService {
 
     if (res.statusCode == 200) {
       final decoded = jsonDecode(res.body);
-
-      // Asegura lista casteada correctamente
       return List<Map<String, dynamic>>.from(decoded['movimientos'] ?? []);
     } else {
       print("Error al obtener movimientos: ${res.statusCode} -> ${res.body}");

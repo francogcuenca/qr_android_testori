@@ -20,10 +20,15 @@ class MovimientoDetalleScreen extends StatelessWidget {
     final id = movimiento['id'] ?? movimiento['movimiento_id'] ?? '—';
     final origen = movimiento['almacen_origen']?.toString() ?? '—';
     final destino = movimiento['almacen_destino']?.toString() ?? '—';
-    final creador =
+    final creadorId =
         movimiento['creador_id']?.toString() ??
         movimiento['creador']?.toString() ??
         '—';
+    final creadorName = movimiento['creador_nombre']?.toString() ?? '—';
+    final creadorSurname = movimiento['creador_apellido']?.toString() ?? '—';
+
+    final creador = '$creadorName $creadorSurname';
+
     final fecha = movimiento['fecha'] ?? movimiento['fecha_creacion'] ?? '';
     final fechaFormateada = formatFecha(fecha);
     final items = movimiento['items'] ?? movimiento['qrs'] ?? [];
@@ -66,21 +71,39 @@ class MovimientoDetalleScreen extends StatelessWidget {
                       separatorBuilder: (_, __) => Divider(),
                       itemBuilder: (_, i) {
                         final it = items[i];
-                        // it puede ser Map o array; asumimos Map con las columnas de tstr_pick_qr
+
+                        final nomArticulo =
+                            it['nom_articulo']?.toString() ??
+                            it['descripcionArti']?.toString() ??
+                            it['DescripcionArti']?.toString() ??
+                            'Artículo sin nombre';
+
                         final numOt =
                             it['num_ot']?.toString() ??
                             it['numOt']?.toString() ??
                             '—';
+
                         final codPieza =
                             it['cod_pieza']?.toString() ??
                             it['codPieza']?.toString() ??
                             '—';
+
                         final cantidad = it['cantidad']?.toString() ?? '—';
                         final lote = it['lote']?.toString() ?? '—';
+
                         return ListTile(
                           leading: Icon(Icons.inventory_2),
-                          title: Text('$codPieza — OT $numOt'),
-                          subtitle: Text('Cant: $cantidad — Lote: $lote'),
+                          title: Text(
+                            nomArticulo,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('$codPieza — OT $numOt'),
+                              Text('Cant: $cantidad — Lote: $lote'),
+                            ],
+                          ),
                         );
                       },
                     ),

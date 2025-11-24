@@ -33,22 +33,22 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: false, // ← IMPORTANTE para evitar colores raros
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1565C0), // ← tu azul
-          primary: const Color(0xFF1565C0),
+          seedColor: const Color.fromRGBO(250, 154, 9, 1), // ← tu azul
+          primary: Color.fromRGBO(250, 154, 9, 1),
         ),
-        primaryColor: const Color(0xFF1565C0),
+        primaryColor: Color.fromRGBO(250, 154, 9, 1),
 
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
 
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1565C0),
+          backgroundColor: Color.fromRGBO(250, 154, 9, 1),
           elevation: 2,
           titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1565C0),
+            backgroundColor: Color.fromRGBO(250, 154, 9, 1),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -60,7 +60,10 @@ class MyApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Color(0xFF1565C0), width: 2),
+            borderSide: const BorderSide(
+              color: Color.fromRGBO(250, 154, 9, 1),
+              width: 2,
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           filled: true,
