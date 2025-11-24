@@ -13,8 +13,7 @@ class MovimientoDetalleScreen extends StatelessWidget {
         movimiento['creador_id']?.toString() ??
         movimiento['creador']?.toString() ??
         '—';
-    final fecha =
-        movimiento['fecha_creacion'] ?? movimiento['created_at'] ?? '';
+    final fecha = movimiento['fecha'] ?? movimiento['created_at'] ?? '';
     final items = movimiento['items'] ?? movimiento['qrs'] ?? [];
 
     return Scaffold(

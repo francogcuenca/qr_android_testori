@@ -94,12 +94,18 @@ class ApiService {
     return res;
   }
 
-  static Future<List> getMovimientos() async {
+  static Future<List> getMovimientos({int? creadorId}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
+    String url = "$baseUrl/movimientos/ver";
+
+    if (creadorId != null) {
+      url += "?creador_id=$creadorId";
+    }
+
     final res = await http.get(
-      Uri.parse("$baseUrl/movimientos/ver"),
+      Uri.parse(url),
       headers: {if (token != null) 'Authorization': 'Bearer $token'},
     );
 
