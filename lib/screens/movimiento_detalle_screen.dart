@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MovimientoDetalleScreen extends StatelessWidget {
   final Map<String, dynamic> movimiento;
   const MovimientoDetalleScreen({super.key, required this.movimiento});
+
+  String formatFecha(String? fechaStr) {
+    if (fechaStr == null || fechaStr.isEmpty) return "—";
+    try {
+      final dt = DateTime.parse(fechaStr);
+      return DateFormat('dd/MM/yyyy HH:mm').format(dt);
+    } catch (e) {
+      return fechaStr; // Si llega mal del backend, lo mostramos crudo
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +24,8 @@ class MovimientoDetalleScreen extends StatelessWidget {
         movimiento['creador_id']?.toString() ??
         movimiento['creador']?.toString() ??
         '—';
-    final fecha = movimiento['fecha'] ?? movimiento['created_at'] ?? '';
+    final fecha = movimiento['fecha'] ?? movimiento['fecha_creacion'] ?? '';
+    final fechaFormateada = formatFecha(fecha);
     final items = movimiento['items'] ?? movimiento['qrs'] ?? [];
 
     return Scaffold(
@@ -40,7 +52,7 @@ class MovimientoDetalleScreen extends StatelessWidget {
                     Text('Origen: $origen'),
                     Text('Destino: $destino'),
                     Text('Creador: $creador'),
-                    Text('Fecha: $fecha'),
+                    Text('Fecha: $fechaFormateada'),
                   ],
                 ),
               ),

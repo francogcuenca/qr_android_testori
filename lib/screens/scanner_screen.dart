@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../models/picked_qr.dart';
+import '../services/articulo_service.dart';
 
 class ScannerScreen extends StatefulWidget {
   final bool singleMode;
@@ -23,18 +24,33 @@ class _ScannerScreenState extends State<ScannerScreen> {
     setState(() => _processing = true);
 
     try {
-      // El modelo ya limpia espacios y parsea correctamente
-      final pq = PickedQr.fromBarcodeString(raw);
+      final pqBase = PickedQr.fromBarcodeString(raw);
+
+      // --- Usar tu servicio existente ---
+      final descripcionArti = await ArticuloService.getArticuloDescripcion(
+        pqBase.codPieza,
+      );
+
+      print('DEBUG: descripcionArti obtenida -> $descripcionArti');
+
+      final pq = PickedQr(
+        numOt: pqBase.numOt,
+        codPieza: pqBase.codPieza,
+        numMedio: pqBase.numMedio,
+        cantidad: pqBase.cantidad,
+        lote: pqBase.lote,
+        descripcionArti: descripcionArti ?? '', // por si viene null
+      );
 
       if (widget.singleMode) {
         Navigator.of(context).pop(pq);
         return;
       }
 
-      // acá podrías guardar el QR en SharedPreferences si querés
+      // Si no es singleMode, guardalo en memoria o SharedPreferences
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('QR inválido: formato incorrecto')),
+        SnackBar(content: Text('QR inválido o artículo no encontrado')),
       );
     } finally {
       await Future.delayed(const Duration(milliseconds: 800));

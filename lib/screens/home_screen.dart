@@ -220,6 +220,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                if (p.descripcionArti != null &&
+                                    p.descripcionArti!.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    child: Text(
+                                      p.descripcionArti!,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
                                 _row('OT', p.numOt),
                                 _row('Cod. Pieza', p.codPieza),
                                 _row('Num. Medio', p.numMedio.toString()),

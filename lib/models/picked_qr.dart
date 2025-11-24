@@ -8,6 +8,9 @@ class PickedQr {
   final String lote;
   final String creador; // opcional
 
+  // NUEVO
+  String? descripcionArti;
+
   PickedQr({
     required this.numOt,
     required this.codPieza,
@@ -15,6 +18,7 @@ class PickedQr {
     required this.cantidad,
     required this.lote,
     this.creador = '',
+    this.descripcionArti,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,15 +28,14 @@ class PickedQr {
     'cantidad': cantidad,
     'lote': lote,
     'creador': creador,
+    'descripcion': descripcionArti,
   };
 
   static PickedQr fromBarcodeString(String raw) {
-    // LOG: raw recibido (crudo)
     developer.log('PickedQr.fromBarcodeString - raw: <$raw>');
 
     final clean = raw.replaceAll(RegExp(r'\s+'), '').trim();
 
-    // LOG: clean y longitud
     developer.log('PickedQr.fromBarcodeString - clean: <$clean>');
     developer.log('PickedQr.fromBarcodeString - clean.length: ${clean.length}');
 
@@ -42,7 +45,6 @@ class PickedQr {
       );
     }
 
-    // Para debug, imprimimos los slices antes de construir
     final sNumOt = clean.substring(0, 5);
     final sCodPieza = clean.substring(5, 15);
     final sCantidad = clean.substring(15, 21);
@@ -54,9 +56,6 @@ class PickedQr {
     );
 
     final cantidad = int.tryParse(sCantidad) ?? 0;
-    if (cantidad == 0) {
-      developer.log('WARNING: cantidad parsed as 0 from <$sCantidad>');
-    }
 
     return PickedQr(
       numOt: sNumOt,

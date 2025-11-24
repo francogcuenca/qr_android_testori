@@ -127,4 +127,21 @@ class ApiService {
       return [];
     }
   }
+
+  static Future<List<dynamic>> getArticuloByCodigo(String codigo) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final url = Uri.parse('$baseUrl/isis/art/$codigo');
+
+    final res = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    }
+
+    return [];
+  }
 }

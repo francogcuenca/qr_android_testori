@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'movimiento_detalle_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class MovimientosScreen extends StatefulWidget {
   @override
@@ -41,6 +42,16 @@ class _MovimientosScreenState extends State<MovimientosScreen> {
     setState(() {
       selectedRange = DateTimeRange(start: start, end: end);
     });
+  }
+
+  String formatFecha(String? fechaStr) {
+    if (fechaStr == null || fechaStr.isEmpty) return "—";
+    try {
+      final dt = DateTime.parse(fechaStr);
+      return DateFormat('dd/MM/yyyy HH:mm').format(dt);
+    } catch (e) {
+      return fechaStr; // Si llega mal del backend, lo mostramos crudo
+    }
   }
 
   // NUEVO: rango de fechas seleccionado (null = sin filtro)
@@ -323,7 +334,7 @@ class _MovimientosScreenState extends State<MovimientosScreen> {
                                           // fecha (alineada a la derecha, con truncado si hace falta)
                                           Flexible(
                                             child: Text(
-                                              (fecha ?? '').toString(),
+                                              formatFecha(fecha),
                                               textAlign: TextAlign.right,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
