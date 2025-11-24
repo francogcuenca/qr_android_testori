@@ -94,26 +94,37 @@ class ApiService {
     return res;
   }
 
-  static Future<List> getMovimientos({int? creadorId}) async {
+  static Future<List<Map<String, dynamic>>> getMovimientos({
+    int? creadorId,
+    String? dateFrom,
+    String? dateTo,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    String url = "$baseUrl/movimientos/ver";
+    // Armar query params
+    final params = <String, String>{};
+    if (creadorId != null) params['creador_id'] = creadorId.toString();
+    if (dateFrom != null) params['dateFrom'] = dateFrom;
+    if (dateTo != null) params['dateTo'] = dateTo;
 
-    if (creadorId != null) {
-      url += "?creador_id=$creadorId";
-    }
+    final uri = Uri.parse(
+      "$baseUrl/movimientos/ver",
+    ).replace(queryParameters: params.isEmpty ? null : params);
 
     final res = await http.get(
-      Uri.parse(url),
+      uri,
       headers: {if (token != null) 'Authorization': 'Bearer $token'},
     );
 
     if (res.statusCode == 200) {
       final decoded = jsonDecode(res.body);
-      return decoded['movimientos'] ?? [];
-    }
 
-    return [];
+      // Asegura lista casteada correctamente
+      return List<Map<String, dynamic>>.from(decoded['movimientos'] ?? []);
+    } else {
+      print("Error al obtener movimientos: ${res.statusCode} -> ${res.body}");
+      return [];
+    }
   }
 }
