@@ -19,6 +19,24 @@ class _HomeScreenState extends State<HomeScreen> {
   String? almacenDestino;
   List<dynamic> almacenes = [];
 
+  Widget _roundedBtn({
+    required IconData icon,
+    required String label,
+    Color? color,
+    required VoidCallback? onTap,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -114,85 +132,87 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('QR Picker')),
       body: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // BOTONES
+            // BOTONES SUPERIORES
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed: _scanSingle,
-                  icon: Icon(Icons.qr_code_scanner),
-                  label: Text('Scan QR'),
+                _roundedBtn(
+                  icon: Icons.qr_code_scanner,
+                  label: 'Scan QR',
+                  onTap: _scanSingle,
                 ),
-                ElevatedButton.icon(
-                  onPressed: sending ? null : _sendMovimiento,
-                  icon: Icon(Icons.play_arrow),
-                  label: sending ? Text('Enviando...') : Text('Enviar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
+                _roundedBtn(
+                  icon: Icons.play_arrow,
+                  label: sending ? "Enviando..." : "Enviar",
+                  color: const Color.fromARGB(255, 68, 147, 179),
+                  onTap: sending ? null : _sendMovimiento,
                 ),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.push(
+                _roundedBtn(
+                  icon: Icons.list_alt,
+                  label: 'Ver Mov.',
+                  onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => MovimientosScreen()),
                   ),
-                  icon: Icon(Icons.list_alt),
-                  label: Text('Ver Mov.'),
                 ),
               ],
             ),
 
-            SizedBox(height: 12),
+            SizedBox(height: 20),
 
             // SELECTS
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: almacenOrigen,
-                    hint: Text('Almacén origen'),
-                    items: almacenes.map((a) {
-                      final id = a['id'].toString();
-                      final name = a['nombre'] ?? a['descripcion'] ?? id;
-                      return DropdownMenuItem(value: id, child: Text(name));
-                    }).toList(),
-                    onChanged: (v) => setState(() => almacenOrigen = v),
-                  ),
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    DropdownButtonFormField<String>(
+                      value: almacenOrigen,
+                      decoration: InputDecoration(labelText: "Almacén origen"),
+                      items: almacenes.map((a) {
+                        final id = a['id'].toString();
+                        final name = a['nombre'] ?? a['descripcion'] ?? id;
+                        return DropdownMenuItem(value: id, child: Text(name));
+                      }).toList(),
+                      onChanged: (v) => setState(() => almacenOrigen = v),
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: almacenDestino,
+                      decoration: InputDecoration(labelText: "Almacén destino"),
+                      items: almacenes.map((a) {
+                        final id = a['id'].toString();
+                        final name = a['nombre'] ?? a['descripcion'] ?? id;
+                        return DropdownMenuItem(value: id, child: Text(name));
+                      }).toList(),
+                      onChanged: (v) => setState(() => almacenDestino = v),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: almacenDestino,
-                    hint: Text('Almacén destino'),
-                    items: almacenes.map((a) {
-                      final id = a['id'].toString();
-                      final name = a['nombre'] ?? a['descripcion'] ?? id;
-                      return DropdownMenuItem(value: id, child: Text(name));
-                    }).toList(),
-                    onChanged: (v) => setState(() => almacenDestino = v),
-                  ),
-                ),
-              ],
+              ),
             ),
 
-            SizedBox(height: 12),
+            SizedBox(height: 16),
 
-            // LISTA DE QRS — AHORA LINDA Y ORDENADA
+            // LISTA
             Expanded(
               child: picked.isEmpty
                   ? Center(child: Text('No hay artículos escaneados'))
-                  : ListView.separated(
+                  : ListView.builder(
                       itemCount: picked.length,
-                      separatorBuilder: (_, __) => SizedBox(height: 6),
                       itemBuilder: (_, idx) {
                         final p = picked[idx];
 
                         return Card(
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 2,
                           child: Padding(

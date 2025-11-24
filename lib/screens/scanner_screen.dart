@@ -63,12 +63,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
       body: Stack(
         children: [
           MobileScanner(controller: cameraController, onDetect: _onDetect),
+
           if (_processing)
             Center(
               child: Container(
-                padding: const EdgeInsets.all(12),
-                color: Colors.black45,
-                child: const CircularProgressIndicator(),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: CircularProgressIndicator(),
               ),
             ),
         ],

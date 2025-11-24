@@ -53,24 +53,49 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Icon(
+                Icons.qr_code_scanner,
+                size: 80,
+                color: Theme.of(context).primaryColor,
+              ),
+              SizedBox(height: 16),
+              Text(
+                "QR Picker",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(height: 32),
+
+              // CAMPOS
               TextField(
                 controller: userCtrl,
                 decoration: InputDecoration(labelText: "Usuario"),
               ),
+              SizedBox(height: 16),
               TextField(
                 controller: passCtrl,
                 decoration: InputDecoration(labelText: "Contraseña"),
                 obscureText: true,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 24),
+
               loading
                   ? CircularProgressIndicator()
-                  : ElevatedButton(onPressed: login, child: Text("Ingresar")),
+                  : SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: login,
+                        child: Text("Ingresar"),
+                      ),
+                    ),
             ],
           ),
         ),

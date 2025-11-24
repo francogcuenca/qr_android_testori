@@ -250,25 +250,7 @@ class _MovimientosScreenState extends State<MovimientosScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          title: Text(
-                            'Movimiento #$id',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 6),
-                              Text('Origen: $origen  →  Destino: $destino'),
-                              SizedBox(height: 4),
-                              Text('Items: ${items.length}  -  Fecha: $fecha'),
-                            ],
-                          ),
-                          trailing: Icon(Icons.chevron_right),
+                        child: InkWell(
                           onTap: () {
                             Navigator.push(
                               context,
@@ -278,6 +260,95 @@ class _MovimientosScreenState extends State<MovimientosScreen> {
                               ),
                             );
                           },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            child: Row(
+                              children: [
+                                // Icono fijo a la izquierda
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.indigo.shade50,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.swap_horiz,
+                                    color: Colors.indigo,
+                                  ),
+                                ),
+
+                                SizedBox(width: 12),
+
+                                // Contenido principal: toma el espacio restante
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Título
+                                      Text(
+                                        'Movimiento #${id ?? "—"}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 6),
+
+                                      // Origen / Destino (se envuelve si es largo)
+                                      Text(
+                                        'Origen: ${origen ?? "—"}  →  Destino: ${destino ?? "—"}',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+
+                                      SizedBox(height: 6),
+
+                                      // Línea con items y fecha, fecha en el extremo derecho
+                                      Row(
+                                        children: [
+                                          // items (flexible)
+                                          Expanded(
+                                            child: Text(
+                                              'Items: ${(items is List) ? items.length : 0}',
+                                              style: TextStyle(
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ),
+
+                                          // fecha (alineada a la derecha, con truncado si hace falta)
+                                          Flexible(
+                                            child: Text(
+                                              (fecha ?? '').toString(),
+                                              textAlign: TextAlign.right,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                SizedBox(width: 8),
+
+                                // Chevron
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.grey[600],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },
